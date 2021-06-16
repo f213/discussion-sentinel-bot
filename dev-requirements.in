@@ -1,0 +1,23 @@
+-c requirements.txt
+ipython
+
+flake8-bugbear
+flake8-cognitive-complexity
+flake8-commas
+flake8-django
+flake8-eradicate
+flake8-isort>=4.0.0
+flake8-fixme
+flake8-mock
+flake8-multiline-containers
+flake8-mutable
+flake8-pep3101
+flake8-pie
+flake8-print
+flake8-printf-formatting
+flake8-quotes
+flake8-simplify
+flake8-todo
+flake8-use-fstring
+flake8-variables-names
+flake8-walrus

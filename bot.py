@@ -45,6 +45,7 @@ def main():
             url_path=bot_token,
             webhook_url=f'https://{app_name}.herokuapp.com/' + bot_token,
         )
+        bot.idle()
 
 
 if __name__ == '__main__':

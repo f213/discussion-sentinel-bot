@@ -5,11 +5,17 @@ from telegram.ext import CallbackContext, MessageHandler, Updater
 from telegram.ext.filters import Filters, MessageFilter
 
 
+def get_message(update: Update) -> Message:
+    return update.message or update.edited_message
+
 
 def delete(update: Update, context: CallbackContext):
-    bot = update.message.bot
+    message = get_message(update)
 
-    bot.delete_message(message_id=update.message.message_id, chat_id=update.message.chat_id)
+    message.bot.delete_message(
+        message_id=message.message_id,
+        chat_id=message.chat_id,
+    )
 
 
 class ContainsTelegramContactFilter(MessageFilter):

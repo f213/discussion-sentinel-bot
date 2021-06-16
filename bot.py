@@ -4,8 +4,6 @@ from telegram import Message, Update
 from telegram.ext import CallbackContext, MessageHandler, Updater
 from telegram.ext.filters import Filters, MessageFilter
 
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
 def delete(update: Update, context: CallbackContext):
@@ -51,5 +49,11 @@ def main():
 if __name__ == '__main__':
     from dotenv import load_dotenv
     load_dotenv()
+
+    if not in_heroku():
+        logging.basicConfig(
+            level=logging.DEBUG,
+            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        )
 
     main()

@@ -19,12 +19,12 @@ def delete(update: Update, context: CallbackContext):
 
 
 class ContainsTelegramContactFilter(MessageFilter):
-    def filter(self, message: Message):
+    def filter(self, message: Message) -> bool:
         return ' @' in message.text
 
 
 class ContainsLinkFilter(MessageFilter):
-    def filter(self, message: Message):
+    def filter(self, message: Message) -> bool:
         return 'http://' in message.text or 'https://' in message.text
 
 
@@ -43,8 +43,6 @@ def main():
     if not in_heroku():
         bot.start_polling()
     else:
-        port = os.getenv('PORT')
-        print(f'In heroku, running on {port}')
         bot.start_webhook(
             listen='0.0.0.0',
             port=os.getenv('PORT'),

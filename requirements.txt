@@ -10,6 +10,8 @@ cachetools==4.2.2
     # via python-telegram-bot
 certifi==2021.5.30
     # via python-telegram-bot
+python-dotenv==0.17.1
+    # via -r requirements.in
 python-telegram-bot==13.6
     # via -r requirements.in
 pytz==2021.1

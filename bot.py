@@ -37,6 +37,8 @@ def main():
     if not in_heroku():
         bot.start_polling()
     else:
+        port = os.getenv('PORT')
+        print(f'In heroku, running on {port}')
         bot.start_webhook(
             listen='0.0.0.0',
             port=os.getenv('PORT'),

@@ -3,6 +3,7 @@ import os
 from telegram import Message, Update
 from telegram.ext import CallbackContext, MessageHandler, Updater
 from telegram.ext.filters import Filters, MessageFilter
+from urlextract import URLExtract
 
 
 def get_message(update: Update) -> Message:
@@ -24,8 +25,11 @@ class ContainsTelegramContactFilter(MessageFilter):
 
 
 class ContainsLinkFilter(MessageFilter):
+    def __init__(self):
+        self.extractor = URLExtract()
+
     def filter(self, message: Message) -> bool:
-        return 'http://' in message.text or 'https://' in message.text
+        return len(self.extractor.find_urls(message.text)) >= 1
 
 
 def in_heroku() -> bool:

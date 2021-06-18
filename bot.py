@@ -19,12 +19,12 @@ def delete(update: Update, context: CallbackContext):
     )
 
 
-class ContainsTelegramContactFilter(MessageFilter):
+class ContainsTelegramContact(MessageFilter):
     def filter(self, message: Message) -> bool:
         return ' @' in message.text
 
 
-class ContainsLinkFilter(MessageFilter):
+class ContainsLink(MessageFilter):
     def __init__(self):
         self.extractor = URLExtract()
 
@@ -36,15 +36,23 @@ def in_heroku() -> bool:
     return os.getenv('HEROKU_APP_NAME', None) is not None
 
 
+def enable_logging():
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    )
+
+
 def main():
     bot_token = os.getenv('BOT_TOKEN')
     app_name = os.getenv('HEROKU_APP_NAME')
 
     bot = Updater(token=bot_token)
-    bot.dispatcher.add_handler(MessageHandler(callback=delete, filters=Filters.text & ContainsTelegramContactFilter()))
-    bot.dispatcher.add_handler(MessageHandler(callback=delete, filters=Filters.text & ContainsLinkFilter()))
+    bot.dispatcher.add_handler(MessageHandler(callback=delete, filters=Filters.text & ContainsTelegramContact()))
+    bot.dispatcher.add_handler(MessageHandler(callback=delete, filters=Filters.text & ContainsLink()))
 
     if not in_heroku():
+        enable_logging()
         bot.start_polling()
     else:
         bot.start_webhook(
@@ -59,11 +67,5 @@ def main():
 if __name__ == '__main__':
     from dotenv import load_dotenv
     load_dotenv()
-
-    if not in_heroku():
-        logging.basicConfig(
-            level=logging.DEBUG,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        )
 
     main()

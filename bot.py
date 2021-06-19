@@ -1,6 +1,7 @@
 import logging
 import operator
 import os
+import sentry_sdk
 from functools import reduce
 from telegram import Message, Update
 from telegram.ext import CallbackContext, MessageHandler, Updater
@@ -66,6 +67,13 @@ def enable_logging():
     )
 
 
+def init_sentry():
+    sentry_dsn = os.getenv('SENTRY_DSN', None)
+
+    if sentry_dsn:
+        sentry_sdk.init(sentry_dsn)
+
+
 def main():
     bot_token = os.getenv('BOT_TOKEN')
     app_name = os.getenv('HEROKU_APP_NAME')
@@ -83,6 +91,7 @@ def main():
         bot.start_polling()
 
     else:
+        init_sentry()
         bot.start_webhook(
             listen='0.0.0.0',
             port=os.getenv('PORT'),

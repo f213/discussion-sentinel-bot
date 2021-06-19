@@ -9,12 +9,8 @@ from telegram.ext.filters import Filters, MessageFilter
 from urlextract import URLExtract
 
 
-def get_message(update: Update) -> Message:
-    return update.message or update.edited_message
-
-
 def delete(update: Update, context: CallbackContext):
-    message = get_message(update)
+    message = update.message or update.edited_message
     if message is None:
         return
 
@@ -86,11 +82,7 @@ def main():
         delete_messages_that_match(ContainsLink()),
     )
 
-    if not in_heroku():
-        enable_logging()
-        bot.start_polling()
-
-    else:
+    if in_heroku():
         init_sentry()
         bot.start_webhook(
             listen='0.0.0.0',
@@ -99,6 +91,9 @@ def main():
             webhook_url=f'https://{app_name}.herokuapp.com/' + bot_token,
         )
         bot.idle()
+    else:  # bot is running on the dev machine
+        enable_logging()
+        bot.start_polling()
 
 
 if __name__ == '__main__':

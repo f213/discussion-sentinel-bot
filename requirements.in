@@ -2,3 +2,5 @@ python-telegram-bot
 python-dotenv
 urlextract
 sentry-sdk
+peewee
+psycopg2-binary

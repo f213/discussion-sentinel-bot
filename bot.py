@@ -70,7 +70,10 @@ def init_sentry():
         sentry_sdk.init(sentry_dsn)
 
 
-def main():
+if __name__ == '__main__':
+    from dotenv import load_dotenv
+    load_dotenv()
+
     bot_token = os.getenv('BOT_TOKEN')
     app_name = os.getenv('HEROKU_APP_NAME')
 
@@ -95,9 +98,3 @@ def main():
         enable_logging()
         bot.start_polling()
 
-
-if __name__ == '__main__':
-    from dotenv import load_dotenv
-    load_dotenv()
-
-    main()

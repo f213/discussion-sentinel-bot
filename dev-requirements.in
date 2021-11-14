@@ -1,5 +1,6 @@
 -c requirements.txt
 ipython
+watchdog[watchmedo]
 
 flake8-bugbear
 flake8-cognitive-complexity

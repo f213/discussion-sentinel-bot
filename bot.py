@@ -1,4 +1,4 @@
-from typing import Final, Optional
+from typing import Optional
 
 import logging
 import operator
@@ -10,14 +10,16 @@ from telegram.ext import CallbackContext, MessageHandler, Updater
 from telegram.ext.filters import Filters, MessageFilter
 from urlextract import URLExtract
 
-DB_ENABLED: Final[bool] = os.getenv('DATABASE_URL') is None
+
+def DB_ENABLED() -> bool:
+    return os.getenv('DATABASE_URL') is None
 
 
 def log_message(message: Message, action: Optional[str] = ''):
     """Create a log entry for telegram message"""
     from models import LogEntry
 
-    if message is None or not DB_ENABLED:
+    if message is None or not DB_ENABLED():
         return
 
     LogEntry.create(
@@ -114,7 +116,7 @@ if __name__ == '__main__':
         delete_messages_that_match(ContainsLink()),
     )
 
-    if DB_ENABLED:  # log all not handled messages
+    if DB_ENABLED():  # log all not handled messages
         from models import create_tables
         create_tables()
         bot.dispatcher.add_handler(

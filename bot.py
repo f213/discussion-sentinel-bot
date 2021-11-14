@@ -10,6 +10,8 @@ from telegram.ext import CallbackContext, MessageHandler, Updater
 from telegram.ext.filters import Filters, MessageFilter
 from urlextract import URLExtract
 
+import rekognition
+
 
 def DB_ENABLED() -> bool:
     return os.getenv('DATABASE_URL') is not None
@@ -22,12 +24,16 @@ def log_message(message: Message, action: Optional[str] = ''):
     if message is None or not DB_ENABLED():
         return
 
+    profile_picture = message.from_user.get_profile_photos().photos[0][0].get_file()
+
     LogEntry.create(
         user_id=message.from_user.id,
         chat_id=message.chat_id,
         message_id=message.message_id,
         text=message.text,
-        meta=dict(),
+        meta={
+            'tags': rekognition.get_labels(profile_picture['file_path']),
+        },
         raw=message.to_dict(),
         action=action,
     )
@@ -43,12 +49,6 @@ def delete(update: Update, context: CallbackContext):
         message_id=message.message_id,
         chat_id=message.chat_id,
     )
-
-
-def log_message_and_metadata(update: Update, context: CallbackContext):
-    message = update.message or update.edited_message
-
-    log_message(message)
 
 
 class ContainsTelegramContact(MessageFilter):

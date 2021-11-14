@@ -16,6 +16,9 @@ client = boto3.client(
 
 
 def get_labels(image_url: str) -> List[str]:
+    if image_url is None:
+        return list()
+
     response = client.detect_labels(
         Image={
             'Bytes': download(image_url),

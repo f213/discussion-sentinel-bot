@@ -1,5 +1,6 @@
 from typing import Optional
 
+import contextlib
 import logging
 import operator
 import os
@@ -17,6 +18,11 @@ def DB_ENABLED() -> bool:
     return os.getenv('DATABASE_URL') is not None
 
 
+def get_profile_picture(message: Message) -> Optional[str]:
+    with contextlib.suppress(IndexError):
+        return message.from_user.get_profile_photos().photos[0][0].get_file()['file_path']
+
+
 def log_message(message: Message, action: Optional[str] = ''):
     """Create a log entry for telegram message"""
     from models import LogEntry
@@ -24,15 +30,15 @@ def log_message(message: Message, action: Optional[str] = ''):
     if message is None or not DB_ENABLED():
         return
 
-    profile_picture = message.from_user.get_profile_photos().photos[0][0].get_file()
-
     LogEntry.create(
         user_id=message.from_user.id,
         chat_id=message.chat_id,
         message_id=message.message_id,
         text=message.text,
         meta={
-            'tags': rekognition.get_labels(profile_picture['file_path']),
+            'tags': rekognition.get_labels(
+                image_url=get_profile_picture(message),
+            ),
         },
         raw=message.to_dict(),
         action=action,

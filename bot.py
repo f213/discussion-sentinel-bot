@@ -12,7 +12,7 @@ from urlextract import URLExtract
 
 
 def DB_ENABLED() -> bool:
-    return os.getenv('DATABASE_URL') is None
+    return os.getenv('DATABASE_URL') is not None
 
 
 def log_message(message: Message, action: Optional[str] = ''):

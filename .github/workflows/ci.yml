@@ -1,0 +1,32 @@
+---
+name: CI
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.9.7"
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            venv
+          key: ${{ runner.os }}-venv-v2-${{ hashFiles('**/*requirements.txt') }}
+
+      - name: Install dependencies
+        if: steps.cache-primes.outputs.cache-hit != 'true'
+        run: |
+          python -m venv venv
+          . venv/bin/activate
+          pip install --upgrade pip pip-tools
+          pip-sync requirements.txt dev-requirements.txt
+
+      - name: Run the linter
+        run: |
+          . venv/bin/activate
+          make lint

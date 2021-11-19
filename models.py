@@ -11,7 +11,7 @@ class LogEntry(pw.Model):
     chat_id = pw.BigIntegerField()
     message_id = pw.BigIntegerField()
     action = pw.CharField(default='')
-    text = pw.CharField()
+    text = pw.TextField()
     meta = JSONField()
     raw = JSONField()
 

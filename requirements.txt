@@ -25,6 +25,8 @@ certifi==2021.5.30
     #   sentry-sdk
 charset-normalizer==2.0.7
     # via httpx
+emoji==1.6.1
+    # via -r requirements.in
 filelock==3.0.12
     # via urlextract
 h11==0.12.0

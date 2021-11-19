@@ -12,6 +12,7 @@ from telegram.ext.filters import Filters, MessageFilter
 from urlextract import URLExtract
 
 import rekognition
+import text
 
 
 def DB_ENABLED() -> bool:
@@ -36,9 +37,10 @@ def log_message(message: Message, action: Optional[str] = ''):
         message_id=message.message_id,
         text=message.text,
         meta={
-            'tags': rekognition.get_labels(
-                image_url=get_profile_picture(message),
-            ),
+            'tags': [
+                *rekognition.get_labels(image_url=get_profile_picture(message)),
+                *text.Labels(message.text)(),
+            ],
         },
         raw=message.to_dict(),
         action=action,

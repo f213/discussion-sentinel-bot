@@ -6,3 +6,4 @@ peewee
 psycopg2-binary
 boto3
 httpx
+emoji

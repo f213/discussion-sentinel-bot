@@ -13,6 +13,8 @@ attrs==21.2.0
     #   flake8-bugbear
     #   flake8-eradicate
     #   flake8-multiline-containers
+autopep8==1.5.7
+    # via -r dev-requirements.in
 backcall==0.2.0
     # via ipython
 cognitive-complexity==1.2.0
@@ -82,7 +84,9 @@ ipython==7.24.1
 ipython-genutils==0.2.0
     # via traitlets
 isort==5.8.0
-    # via flake8-isort
+    # via
+    #   -r dev-requirements.in
+    #   flake8-isort
 jedi==0.18.0
     # via ipython
 matplotlib-inline==0.1.2
@@ -101,6 +105,7 @@ ptyprocess==0.7.0
     # via pexpect
 pycodestyle==2.7.0
     # via
+    #   autopep8
     #   flake8
     #   flake8-print
     #   flake8-todo
@@ -116,6 +121,8 @@ six==1.16.0
     #   flake8-print
 testfixtures==6.17.1
     # via flake8-isort
+toml==0.10.2
+    # via autopep8
 traitlets==5.0.5
     # via
     #   ipython

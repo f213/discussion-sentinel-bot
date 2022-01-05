@@ -1,21 +1,14 @@
 from typing import Optional
 
-import logging
-import operator
 import os
-import sentry_sdk
-from functools import reduce
 from telegram import Message, Update
 from telegram.ext import CallbackContext, Dispatcher, MessageHandler, Updater
-from telegram.ext.filters import BaseFilter, Filters, MessageFilter
-from urlextract import URLExtract
+from telegram.ext.filters import BaseFilter, Filters
 
 import rekognition
 import text
-
-
-def DB_ENABLED() -> bool:
-    return os.getenv('DATABASE_URL') is not None
+from filters import ContainsLink, ContainsTelegramContact, IsMessageOnBehalfOfChat, with_default_filters
+from helpers import DB_ENABLED, enable_logging, in_heroku, init_sentry
 
 
 def get_profile_picture(message: Message) -> Optional[str]:
@@ -59,54 +52,9 @@ def delete(update: Update, context: CallbackContext):
     )
 
 
-class ContainsTelegramContact(MessageFilter):
-    def filter(self, message: Message) -> bool:
-        return ' @' in message.text
-
-
-class ContainsLink(MessageFilter):
-    def __init__(self) -> None:
-        self.extractor = URLExtract()
-
-    def filter(self, message: Message) -> bool:
-        return len(self.extractor.find_urls(message.text)) >= 1
-
-
-class ChatMessageOnly(MessageFilter):
-    def filter(self, message: Message) -> bool:
-        return message.forward_from_message_id is None
-
-
-def with_default_filters(*filters) -> BaseFilter:
-    """Apply default filters to the given filter classes"""
-    default_filters = [
-        Filters.text,
-        ChatMessageOnly(),
-    ]
-    return reduce(operator.and_, [*default_filters, *filters])  # МАМА Я УМЕЮ ФУНКЦИОНАЛЬНО ПРОГРАММИРОВАТЬ
-
-
-def delete_messages_that_match(*filters) -> MessageHandler:
+def delete_messages_that_match(*filters: BaseFilter) -> MessageHandler:
     """Sugar for quick adding delete message callbacks"""
     return MessageHandler(callback=delete, filters=with_default_filters(*filters))
-
-
-def in_heroku() -> bool:
-    return os.getenv('HEROKU_APP_NAME', None) is not None
-
-
-def enable_logging() -> None:
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    )
-
-
-def init_sentry() -> None:
-    sentry_dsn = os.getenv('SENTRY_DSN', None)
-
-    if sentry_dsn:
-        sentry_sdk.init(sentry_dsn)
 
 
 if __name__ == '__main__':
@@ -121,12 +69,9 @@ if __name__ == '__main__':
     bot = Updater(token=bot_token)
     dispatcher: Dispatcher = bot.dispatcher  # type: ignore
 
-    dispatcher.add_handler(
-        delete_messages_that_match(ContainsTelegramContact()),
-    )
-    dispatcher.add_handler(
-        delete_messages_that_match(ContainsLink()),
-    )
+    dispatcher.add_handler(delete_messages_that_match(ContainsTelegramContact()))
+    dispatcher.add_handler(delete_messages_that_match(ContainsLink()))
+    dispatcher.add_handler(delete_messages_that_match(IsMessageOnBehalfOfChat()))
 
     if DB_ENABLED():  # log all not handled messages
         from models import create_tables

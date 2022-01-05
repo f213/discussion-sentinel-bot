@@ -77,7 +77,12 @@ class ChatMessageOnly(MessageFilter):
         return message.forward_from_message_id is None
 
 
-def with_default_filters(*filters) -> BaseFilter:
+class IsMessageOnBehalfOfChat(MessageFilter):
+    def filter(self, message: Message) -> bool:
+        return message.sender_chat is not None
+
+
+def with_default_filters(*filters: BaseFilter) -> BaseFilter:
     """Apply default filters to the given filter classes"""
     default_filters = [
         Filters.text,
@@ -86,7 +91,7 @@ def with_default_filters(*filters) -> BaseFilter:
     return reduce(operator.and_, [*default_filters, *filters])  # МАМА Я УМЕЮ ФУНКЦИОНАЛЬНО ПРОГРАММИРОВАТЬ
 
 
-def delete_messages_that_match(*filters) -> MessageHandler:
+def delete_messages_that_match(*filters: BaseFilter) -> MessageHandler:
     """Sugar for quick adding delete message callbacks"""
     return MessageHandler(callback=delete, filters=with_default_filters(*filters))
 
@@ -121,12 +126,9 @@ if __name__ == '__main__':
     bot = Updater(token=bot_token)
     dispatcher: Dispatcher = bot.dispatcher  # type: ignore
 
-    dispatcher.add_handler(
-        delete_messages_that_match(ContainsTelegramContact()),
-    )
-    dispatcher.add_handler(
-        delete_messages_that_match(ContainsLink()),
-    )
+    dispatcher.add_handler(delete_messages_that_match(ContainsTelegramContact()))
+    dispatcher.add_handler(delete_messages_that_match(ContainsLink()))
+    dispatcher.add_handler(delete_messages_that_match(IsMessageOnBehalfOfChat()))
 
     if DB_ENABLED():  # log all not handled messages
         from models import create_tables

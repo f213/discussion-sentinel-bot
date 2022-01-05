@@ -1,17 +1,15 @@
 from typing import Optional
 
 import logging
-import operator
 import os
 import sentry_sdk
-from functools import reduce
 from telegram import Message, Update
 from telegram.ext import CallbackContext, Dispatcher, MessageHandler, Updater
-from telegram.ext.filters import BaseFilter, Filters, MessageFilter
-from urlextract import URLExtract
+from telegram.ext.filters import BaseFilter, Filters
 
 import rekognition
 import text
+from filters import ContainsLink, ContainsTelegramContact, IsMessageOnBehalfOfChat, with_default_filters
 
 
 def DB_ENABLED() -> bool:
@@ -57,38 +55,6 @@ def delete(update: Update, context: CallbackContext):
         message_id=message.message_id,
         chat_id=message.chat_id,
     )
-
-
-class ContainsTelegramContact(MessageFilter):
-    def filter(self, message: Message) -> bool:
-        return ' @' in message.text
-
-
-class ContainsLink(MessageFilter):
-    def __init__(self) -> None:
-        self.extractor = URLExtract()
-
-    def filter(self, message: Message) -> bool:
-        return len(self.extractor.find_urls(message.text)) >= 1
-
-
-class ChatMessageOnly(MessageFilter):
-    def filter(self, message: Message) -> bool:
-        return message.forward_from_message_id is None
-
-
-class IsMessageOnBehalfOfChat(MessageFilter):
-    def filter(self, message: Message) -> bool:
-        return message.sender_chat is not None
-
-
-def with_default_filters(*filters: BaseFilter) -> BaseFilter:
-    """Apply default filters to the given filter classes"""
-    default_filters = [
-        Filters.text,
-        ChatMessageOnly(),
-    ]
-    return reduce(operator.and_, [*default_filters, *filters])  # МАМА Я УМЕЮ ФУНКЦИОНАЛЬНО ПРОГРАММИРОВАТЬ
 
 
 def delete_messages_that_match(*filters: BaseFilter) -> MessageHandler:

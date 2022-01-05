@@ -4,10 +4,7 @@ import emoji
 
 
 class Labels:
-    LABELS = [
-    ]
-
-    def __init__(self, text: str):
+    def __init__(self, text: str) -> None:
         self.text = text
 
     def __call__(self) -> List[str]:

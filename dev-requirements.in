@@ -2,6 +2,11 @@
 ipython
 watchdog[watchmedo]
 
+mypy
+types-emoji
+types-boto3
+
+
 isort
 autopep8<1.6.0
 flake8-bugbear
@@ -24,3 +29,5 @@ flake8-todo
 flake8-use-fstring
 flake8-variables-names
 flake8-walrus
+
+

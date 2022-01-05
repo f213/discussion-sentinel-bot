@@ -1,8 +1,6 @@
 from typing import Optional
 
-import logging
 import os
-import sentry_sdk
 from telegram import Message, Update
 from telegram.ext import CallbackContext, Dispatcher, MessageHandler, Updater
 from telegram.ext.filters import BaseFilter, Filters
@@ -10,10 +8,7 @@ from telegram.ext.filters import BaseFilter, Filters
 import rekognition
 import text
 from filters import ContainsLink, ContainsTelegramContact, IsMessageOnBehalfOfChat, with_default_filters
-
-
-def DB_ENABLED() -> bool:
-    return os.getenv('DATABASE_URL') is not None
+from helpers import DB_ENABLED, enable_logging, in_heroku, init_sentry
 
 
 def get_profile_picture(message: Message) -> Optional[str]:
@@ -60,24 +55,6 @@ def delete(update: Update, context: CallbackContext):
 def delete_messages_that_match(*filters: BaseFilter) -> MessageHandler:
     """Sugar for quick adding delete message callbacks"""
     return MessageHandler(callback=delete, filters=with_default_filters(*filters))
-
-
-def in_heroku() -> bool:
-    return os.getenv('HEROKU_APP_NAME', None) is not None
-
-
-def enable_logging() -> None:
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    )
-
-
-def init_sentry() -> None:
-    sentry_dsn = os.getenv('SENTRY_DSN', None)
-
-    if sentry_dsn:
-        sentry_sdk.init(sentry_dsn)
 
 
 if __name__ == '__main__':

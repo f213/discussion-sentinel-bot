@@ -12,6 +12,7 @@ dev-deps: deps
 
 lint:
 	flake8 *.py
+	mypy
 
 dev:
 	watchmedo auto-restart --patterns '*.py' python bot.py

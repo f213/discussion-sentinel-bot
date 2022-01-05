@@ -1,14 +1,13 @@
 from typing import Optional
 
-import contextlib
 import logging
 import operator
 import os
 import sentry_sdk
 from functools import reduce
 from telegram import Message, Update
-from telegram.ext import CallbackContext, MessageHandler, Updater
-from telegram.ext.filters import Filters, MessageFilter
+from telegram.ext import CallbackContext, Dispatcher, MessageHandler, Updater
+from telegram.ext.filters import BaseFilter, Filters, MessageFilter
 from urlextract import URLExtract
 
 import rekognition
@@ -20,8 +19,11 @@ def DB_ENABLED() -> bool:
 
 
 def get_profile_picture(message: Message) -> Optional[str]:
-    with contextlib.suppress(IndexError):
-        return message.from_user.get_profile_photos().photos[0][0].get_file()['file_path']
+    photos = message.from_user.get_profile_photos()
+
+    if photos is not None and photos.total_count > 0:
+        profile_picture = photos.photos[0][0].get_file()
+        return profile_picture.file_path
 
 
 def log_message(message: Message, action: Optional[str] = ''):
@@ -49,8 +51,6 @@ def log_message(message: Message, action: Optional[str] = ''):
 
 def delete(update: Update, context: CallbackContext):
     message = update.message or update.edited_message
-    if message is None:
-        return
 
     log_message(message, action='delete')
     message.bot.delete_message(
@@ -65,7 +65,7 @@ class ContainsTelegramContact(MessageFilter):
 
 
 class ContainsLink(MessageFilter):
-    def __init__(self):
+    def __init__(self) -> None:
         self.extractor = URLExtract()
 
     def filter(self, message: Message) -> bool:
@@ -77,7 +77,7 @@ class ChatMessageOnly(MessageFilter):
         return message.forward_from_message_id is None
 
 
-def with_default_filters(*filters):
+def with_default_filters(*filters) -> BaseFilter:
     """Apply default filters to the given filter classes"""
     default_filters = [
         Filters.text,
@@ -95,14 +95,14 @@ def in_heroku() -> bool:
     return os.getenv('HEROKU_APP_NAME', None) is not None
 
 
-def enable_logging():
+def enable_logging() -> None:
     logging.basicConfig(
         level=logging.DEBUG,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     )
 
 
-def init_sentry():
+def init_sentry() -> None:
     sentry_dsn = os.getenv('SENTRY_DSN', None)
 
     if sentry_dsn:
@@ -114,20 +114,24 @@ if __name__ == '__main__':
     load_dotenv()
 
     bot_token = os.getenv('BOT_TOKEN')
+    if not bot_token:
+        raise RuntimeError('Please set BOT_TOKEN environment variable')
     app_name = os.getenv('HEROKU_APP_NAME')
 
     bot = Updater(token=bot_token)
-    bot.dispatcher.add_handler(
+    dispatcher: Dispatcher = bot.dispatcher  # type: ignore
+
+    dispatcher.add_handler(
         delete_messages_that_match(ContainsTelegramContact()),
     )
-    bot.dispatcher.add_handler(
+    dispatcher.add_handler(
         delete_messages_that_match(ContainsLink()),
     )
 
     if DB_ENABLED():  # log all not handled messages
         from models import create_tables
-        create_tables()
-        bot.dispatcher.add_handler(
+        create_tables()  # type: ignore
+        dispatcher.add_handler(
             MessageHandler(filters=Filters.text, callback=lambda update, context: log_message(update.message or update.edited_message)),
         )
 
@@ -135,7 +139,7 @@ if __name__ == '__main__':
         init_sentry()
         bot.start_webhook(
             listen='0.0.0.0',
-            port=os.getenv('PORT'),
+            port=os.getenv('PORT'),  # type: ignore
             url_path=bot_token,
             webhook_url=f'https://{app_name}.herokuapp.com/' + bot_token,
         )

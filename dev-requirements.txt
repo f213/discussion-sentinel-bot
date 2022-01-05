@@ -17,6 +17,10 @@ autopep8==1.5.7
     # via -r dev-requirements.in
 backcall==0.2.0
     # via ipython
+boto3-stubs==1.20.28
+    # via types-boto3
+botocore-stubs==1.23.28
+    # via boto3-stubs
 cognitive-complexity==1.2.0
     # via flake8-cognitive-complexity
 decorator==5.0.9
@@ -93,6 +97,10 @@ matplotlib-inline==0.1.2
     # via ipython
 mccabe==0.6.1
     # via flake8
+mypy==0.930
+    # via -r dev-requirements.in
+mypy-extensions==0.4.3
+    # via mypy
 parso==0.8.2
     # via jedi
 pexpect==4.8.0
@@ -123,12 +131,21 @@ testfixtures==6.17.1
     # via flake8-isort
 toml==0.10.2
     # via autopep8
+tomli==2.0.0
+    # via mypy
 traitlets==5.0.5
     # via
     #   ipython
     #   matplotlib-inline
+types-boto3==1.0.1
+    # via -r dev-requirements.in
+types-emoji==1.2.6
+    # via -r dev-requirements.in
 typing-extensions==3.10.0.0
-    # via flake8-pie
+    # via
+    #   boto3-stubs
+    #   flake8-pie
+    #   mypy
 watchdog[watchmedo]==2.1.6
     # via -r dev-requirements.in
 wcwidth==0.2.5

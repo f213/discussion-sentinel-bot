@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import boto3
 import httpx
@@ -15,7 +15,7 @@ client = boto3.client(
 )
 
 
-def get_labels(image_url: str) -> List[str]:
+def get_labels(image_url: Optional[str]) -> List[str]:
     if image_url is None:
         return list()
 

@@ -66,3 +66,22 @@ jobs:
           tags: |
             ghcr.io/${{ steps.image.outputs.lowercase }}:latest
             ghcr.io/${{ steps.image.outputs.lowercase }}:${{ github.sha }}
+
+  deploy:
+    needs: build-docker-image
+    if: ${{ github.ref == 'refs/heads/master' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read image identifiers
+        id: image
+        uses: ASzc/change-string-case-action@v1
+        with:
+          string: ${{ github.repository }}
+
+      - name: Update backend image
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: circle
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: docker service update tg-antispam_bot --image ghcr.io/${{ steps.image.outputs.lowercase }}:${{ github.sha }} --with-registry-auth

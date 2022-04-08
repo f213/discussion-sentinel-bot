@@ -7,8 +7,8 @@ def DB_ENABLED() -> bool:
     return os.getenv('DATABASE_URL') is not None
 
 
-def in_heroku() -> bool:
-    return os.getenv('HEROKU_APP_NAME', None) is not None
+def in_production() -> bool:
+    return os.getenv('APP_NAME', None) is not None
 
 
 def enable_logging() -> None:
@@ -28,6 +28,6 @@ def init_sentry() -> None:
 __all__ = [
     'DB_ENABLED',
     'enable_logging',
-    'in_heroku',
+    'in_production',
     'init_sentry',
 ]

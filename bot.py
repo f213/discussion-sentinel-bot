@@ -8,7 +8,7 @@ from telegram.ext.filters import BaseFilter, Filters
 import rekognition
 import text
 from filters import ContainsLink, ContainsTelegramContact, IsMessageOnBehalfOfChat, with_default_filters
-from helpers import DB_ENABLED, enable_logging, in_heroku, init_sentry
+from helpers import DB_ENABLED, enable_logging, in_production, init_sentry
 
 
 def get_profile_picture(message: Message) -> Optional[str]:
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     bot_token = os.getenv('BOT_TOKEN')
     if not bot_token:
         raise RuntimeError('Please set BOT_TOKEN environment variable')
-    app_name = os.getenv('HEROKU_APP_NAME')
+    app_name = os.getenv('APP_NAME')
 
     bot = Updater(token=bot_token)
     dispatcher: Dispatcher = bot.dispatcher  # type: ignore
@@ -80,13 +80,13 @@ if __name__ == '__main__':
             MessageHandler(filters=Filters.text, callback=lambda update, context: log_message(update.message or update.edited_message)),
         )
 
-    if in_heroku():
+    if in_production():
         init_sentry()
         bot.start_webhook(
             listen='0.0.0.0',
             port=os.getenv('PORT'),  # type: ignore
             url_path=bot_token,
-            webhook_url=f'https://{app_name}.herokuapp.com/' + bot_token,
+            webhook_url=f'https://{app_name}.tough-dev.school/' + bot_token,
         )
         bot.idle()
     else:  # bot is running on the dev machine

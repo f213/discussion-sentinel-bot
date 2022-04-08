@@ -84,7 +84,7 @@ if __name__ == '__main__':
         init_sentry()
         bot.start_webhook(
             listen='0.0.0.0',
-            port=os.getenv('PORT'),  # type: ignore
+            port=8000,
             url_path=bot_token,
             webhook_url=f'https://{app_name}.tough-dev.school/' + bot_token,
         )

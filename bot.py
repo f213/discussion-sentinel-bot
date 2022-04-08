@@ -64,7 +64,7 @@ if __name__ == '__main__':
     bot_token = os.getenv('BOT_TOKEN')
     if not bot_token:
         raise RuntimeError('Please set BOT_TOKEN environment variable')
-    app_name = os.getenv('APP_NAME')
+    app_name = os.getenv('BOT_NAME')
 
     bot = Updater(token=bot_token)
     dispatcher: Dispatcher = bot.dispatcher  # type: ignore

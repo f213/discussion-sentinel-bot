@@ -8,7 +8,7 @@ def DB_ENABLED() -> bool:
 
 
 def in_production() -> bool:
-    return os.getenv('APP_NAME', None) is not None
+    return os.getenv('BOT_NAME', None) is not None
 
 
 def enable_logging() -> None:

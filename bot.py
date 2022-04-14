@@ -21,10 +21,10 @@ def get_profile_picture(message: Message) -> Optional[str]:
 
 def log_message(message: Message, action: Optional[str] = ''):
     """Create a log entry for telegram message"""
-    from models import LogEntry
 
     if message is None or not DB_ENABLED():
         return
+    from models import LogEntry
 
     LogEntry.create(
         user_id=message.from_user.id,

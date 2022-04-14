@@ -4,6 +4,8 @@ from telegram import Message
 from telegram.ext import BaseFilter, Filters, MessageFilter
 from urlextract import URLExtract
 
+import text
+
 
 class ChatMessageOnly(MessageFilter):
     def filter(self, message: Message) -> bool:
@@ -37,10 +39,16 @@ class ContainsLink(MessageFilter):
         return len(self.extractor.find_urls(message.text)) >= 1
 
 
+class ContainsThreeOrMoreEmojies(MessageFilter):
+    def filter(self, message: Message) -> bool:
+        return 'three_or_more_emojies' in text.Labels(message.text)()
+
+
 __all__ = [
-    'ContainsTelegramContact',
-    'ContainsLink',
     'ChatMessageOnly',
+    'ContainsLink',
+    'ContainsTelegramContact',
+    'ContainsThreeOrMoreEmojies',
     'IsMessageOnBehalfOfChat',
     'with_default_filters',
 ]

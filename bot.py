@@ -7,7 +7,8 @@ from telegram.ext.filters import BaseFilter, Filters
 
 import rekognition
 import text
-from filters import ContainsLink, ContainsTelegramContact, IsMessageOnBehalfOfChat, with_default_filters
+from filters import (
+    ContainsLink, ContainsTelegramContact, ContainsThreeOrMoreEmojies, IsMessageOnBehalfOfChat, with_default_filters)
 from helpers import DB_ENABLED, enable_logging, in_production, init_sentry
 
 
@@ -72,6 +73,7 @@ if __name__ == '__main__':
     dispatcher.add_handler(delete_messages_that_match(ContainsTelegramContact()))
     dispatcher.add_handler(delete_messages_that_match(ContainsLink()))
     dispatcher.add_handler(delete_messages_that_match(IsMessageOnBehalfOfChat()))
+    dispatcher.add_handler(delete_messages_that_match(ContainsThreeOrMoreEmojies()))
 
     if DB_ENABLED():  # log all not handled messages
         from models import create_tables

@@ -1,4 +1,4 @@
-FROM python:3.10.2-slim-bullseye
+FROM python:3.10.9-slim-bullseye
 
 RUN apt-get update && apt-get --no-install-recommends -y install wget && rm -Rf rm -rf /var/lib/apt/lists/*
 

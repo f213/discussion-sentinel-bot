@@ -8,7 +8,8 @@ from telegram.ext.filters import BaseFilter, Filters
 import rekognition
 import text
 from filters import (
-    ContainsLink, ContainsTelegramContact, ContainsThreeOrMoreEmojies, IsMessageOnBehalfOfChat, with_default_filters)
+    ContainsLink, ContainsTelegramContact, ContainsThreeOrMoreEmojies, IsMedia, IsMessageOnBehalfOfChat,
+    with_default_filters)
 from helpers import DB_ENABLED, enable_logging, in_production, init_sentry
 
 
@@ -31,7 +32,7 @@ def log_message(message: Message, action: Optional[str] = ''):
         user_id=message.from_user.id,
         chat_id=message.chat_id,
         message_id=message.message_id,
-        text=message.text,
+        text=message.text or '',
         meta={
             'tags': [
                 *rekognition.get_labels(image_url=get_profile_picture(message)),
@@ -74,6 +75,7 @@ if __name__ == '__main__':
     dispatcher.add_handler(delete_messages_that_match(ContainsLink()))
     dispatcher.add_handler(delete_messages_that_match(IsMessageOnBehalfOfChat()))
     dispatcher.add_handler(delete_messages_that_match(ContainsThreeOrMoreEmojies()))
+    dispatcher.add_handler(delete_messages_that_match(IsMedia()))
 
     if DB_ENABLED():  # log all not handled messages
         from models import create_tables

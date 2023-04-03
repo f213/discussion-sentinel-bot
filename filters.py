@@ -1,7 +1,7 @@
 import operator
 from functools import reduce
 from telegram import Message
-from telegram.ext import BaseFilter, Filters, MessageFilter
+from telegram.ext import BaseFilter, MessageFilter
 from urlextract import URLExtract
 
 import text
@@ -15,7 +15,6 @@ class ChatMessageOnly(MessageFilter):
 def with_default_filters(*filters: BaseFilter) -> BaseFilter:
     """Apply default filters to the given filter classes"""
     default_filters = [
-        Filters.text,
         ChatMessageOnly(),
     ]
     return reduce(operator.and_, [*default_filters, *filters])  # МАМА Я УМЕЮ ФУНКЦИОНАЛЬНО ПРОГРАММИРОВАТЬ
@@ -28,6 +27,9 @@ class IsMessageOnBehalfOfChat(MessageFilter):
 
 class ContainsTelegramContact(MessageFilter):
     def filter(self, message: Message) -> bool:
+        if message.text is None:
+            return False  # type: ignore
+
         return ' @' in message.text or message.text.startswith('@')
 
 
@@ -36,12 +38,26 @@ class ContainsLink(MessageFilter):
         self.extractor = URLExtract()
 
     def filter(self, message: Message) -> bool:
+        if message.text is None:
+            return False  # type: ignore
+
         return len(self.extractor.find_urls(message.text)) >= 1
 
 
 class ContainsThreeOrMoreEmojies(MessageFilter):
     def filter(self, message: Message) -> bool:
         return 'three_or_more_emojies' in text.Labels(message.text)()
+
+
+class IsMedia(MessageFilter):
+    def filter(self, message: Message) -> bool:
+        if any([message.document, message.audio, message.voice, message.video_note]):
+            return True
+
+        if len(message.photo) > 0:
+            return True
+
+        return False
 
 
 __all__ = [

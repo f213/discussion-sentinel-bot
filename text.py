@@ -1,16 +1,19 @@
-from typing import List
+from typing import List, Optional
 
 import emoji
 
 
 class Labels:
-    def __init__(self, text: str) -> None:
+    def __init__(self, text: Optional[str]) -> None:
         self.text = text
 
     def __call__(self) -> List[str]:
         return self.get_emoji_label()
 
     def get_emoji_label(self) -> List[str]:
+        if self.text is None:
+            return []
+
         emoji_count = len(emoji.emoji_lis(self.text))
 
         if emoji_count == 0:

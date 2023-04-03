@@ -28,7 +28,7 @@ class IsMessageOnBehalfOfChat(MessageFilter):
 
 class ContainsTelegramContact(MessageFilter):
     def filter(self, message: Message) -> bool:
-        return ' @' in message.text
+        return ' @' in message.text or message.text.startswith('@')
 
 
 class ContainsLink(MessageFilter):

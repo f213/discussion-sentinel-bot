@@ -12,7 +12,7 @@ class HasNoValidPreviousMessages(MessageFilter):
 
     def filter(self, message: Message) -> bool:
         if not DB_ENABLED():
-            return False
+            return True
 
         return self.has_no_valid_previous_messages(user_id=message.from_user.id, chat_id=message.chat_id)
 

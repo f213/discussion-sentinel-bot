@@ -7,9 +7,7 @@ from telegram.ext.filters import BaseFilter, Filters
 
 import rekognition
 import text
-from filters import (
-    ContainsLink, ContainsTelegramContact, ContainsThreeOrMoreEmojies, IsMedia, IsMessageOnBehalfOfChat,
-    with_default_filters)
+from filters import ContainsLink, ContainsTelegramContact, ContainsThreeOrMoreEmojies, IsMedia, IsMessageOnBehalfOfChat, with_default_filters
 from helpers import DB_ENABLED, enable_logging, in_production, init_sentry
 
 

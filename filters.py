@@ -6,14 +6,26 @@ from telegram.ext import BaseFilter, MessageFilter
 import text
 from helpers import DB_ENABLED
 
-MIN_PREVIOUS_MESSAGES_COUNT = 3
 
+class HasValidPreviousMessages(MessageFilter):
+    MIN_PREVIOUS_MESSAGES_COUNT = 3
 
-def is_fake_user(user_id: int) -> bool:
-    from models import LogEntry
+    def filter(self, message: Message) -> bool:
+        if not DB_ENABLED():
+            return False
 
-    messages_count = LogEntry.select().where((LogEntry.user_id == user_id) & (LogEntry.action != 'delete')).count()
-    return messages_count < MIN_PREVIOUS_MESSAGES_COUNT
+        return self.has_no_valid_previous_messages(user_id=message.from_user.id, chat_id=message.chat_id)
+
+    @classmethod
+    def has_no_valid_previous_messages(cls, user_id: int, chat_id: int) -> bool:
+        from models import LogEntry
+
+        messages_count = LogEntry.select().where(
+            (LogEntry.user_id == user_id),
+            (LogEntry.chat_id == chat_id),
+            (LogEntry.action != 'delete'),
+        ).count()
+        return messages_count < cls.MIN_PREVIOUS_MESSAGES_COUNT
 
 
 class ChatMessageOnly(MessageFilter):
@@ -25,6 +37,7 @@ def with_default_filters(*filters: BaseFilter) -> BaseFilter:
     """Apply default filters to the given filter classes"""
     default_filters = [
         ChatMessageOnly(),
+        HasValidPreviousMessages(),
     ]
     return reduce(operator.and_, [*default_filters, *filters])  # МАМА Я УМЕЮ ФУНКЦИОНАЛЬНО ПРОГРАММИРОВАТЬ
 
@@ -49,12 +62,7 @@ class ContainsLink(MessageFilter):
             return False  # type: ignore
 
         entities_types = set([entity.type for entity in message.entities])
-        has_links = len(entities_types.intersection({'url', 'text_link'})) != 0
-
-        if DB_ENABLED() and has_links:
-            return is_fake_user(message.from_user.id)
-
-        return has_links
+        return len(entities_types.intersection({'url', 'text_link'})) != 0
 
 
 class ContainsThreeOrMoreEmojies(MessageFilter):

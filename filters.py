@@ -7,7 +7,7 @@ import text
 from helpers import DB_ENABLED
 
 
-class HasValidPreviousMessages(MessageFilter):
+class HasNoValidPreviousMessages(MessageFilter):
     MIN_PREVIOUS_MESSAGES_COUNT = 3
 
     def filter(self, message: Message) -> bool:
@@ -37,7 +37,7 @@ def with_default_filters(*filters: BaseFilter) -> BaseFilter:
     """Apply default filters to the given filter classes"""
     default_filters = [
         ChatMessageOnly(),
-        HasValidPreviousMessages(),
+        HasNoValidPreviousMessages(),
     ]
     return reduce(operator.and_, [*default_filters, *filters])  # МАМА Я УМЕЮ ФУНКЦИОНАЛЬНО ПРОГРАММИРОВАТЬ
 

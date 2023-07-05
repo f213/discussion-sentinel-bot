@@ -1,4 +1,5 @@
-FROM python:3.10.9-slim-bullseye
+ARG PYTHON_VERSION
+FROM python:${PYTHON_VERSION}-slim-bullseye
 
 RUN apt-get update && apt-get --no-install-recommends -y install wget && rm -Rf rm -rf /var/lib/apt/lists/*
 

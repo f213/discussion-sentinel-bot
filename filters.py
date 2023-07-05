@@ -2,9 +2,30 @@ import operator
 from functools import reduce
 from telegram import Message
 from telegram.ext import BaseFilter, MessageFilter
-from urlextract import URLExtract
 
 import text
+from helpers import DB_ENABLED
+
+
+class HasNoValidPreviousMessages(MessageFilter):
+    MIN_PREVIOUS_MESSAGES_COUNT = 3
+
+    def filter(self, message: Message) -> bool:
+        if not DB_ENABLED():
+            return True
+
+        return self.has_no_valid_previous_messages(user_id=message.from_user.id, chat_id=message.chat_id)
+
+    @classmethod
+    def has_no_valid_previous_messages(cls, user_id: int, chat_id: int) -> bool:
+        from models import LogEntry
+
+        messages_count = LogEntry.select().where(
+            (LogEntry.user_id == user_id),
+            (LogEntry.chat_id == chat_id),
+            (LogEntry.action != 'delete'),
+        ).count()
+        return messages_count < cls.MIN_PREVIOUS_MESSAGES_COUNT
 
 
 class ChatMessageOnly(MessageFilter):
@@ -16,6 +37,7 @@ def with_default_filters(*filters: BaseFilter) -> BaseFilter:
     """Apply default filters to the given filter classes"""
     default_filters = [
         ChatMessageOnly(),
+        HasNoValidPreviousMessages(),
     ]
     return reduce(operator.and_, [*default_filters, *filters])  # МАМА Я УМЕЮ ФУНКЦИОНАЛЬНО ПРОГРАММИРОВАТЬ
 
@@ -34,14 +56,13 @@ class ContainsTelegramContact(MessageFilter):
 
 
 class ContainsLink(MessageFilter):
-    def __init__(self) -> None:
-        self.extractor = URLExtract()
 
     def filter(self, message: Message) -> bool:
         if message.text is None:
             return False  # type: ignore
 
-        return len(self.extractor.find_urls(message.text)) >= 1
+        entities_types = set([entity.type for entity in message.entities])
+        return len(entities_types.intersection({'url', 'text_link'})) != 0
 
 
 class ContainsThreeOrMoreEmojies(MessageFilter):

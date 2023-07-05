@@ -2,9 +2,18 @@ import operator
 from functools import reduce
 from telegram import Message
 from telegram.ext import BaseFilter, MessageFilter
-from urlextract import URLExtract
 
 import text
+from helpers import DB_ENABLED
+
+MIN_PREVIOUS_MESSAGES_COUNT = 3
+
+
+def is_fake_user(user_id: int) -> bool:
+    from models import LogEntry
+
+    messages_count = LogEntry.select().where((LogEntry.user_id == user_id) & (LogEntry.action != 'delete')).count()
+    return messages_count < MIN_PREVIOUS_MESSAGES_COUNT
 
 
 class ChatMessageOnly(MessageFilter):
@@ -34,14 +43,18 @@ class ContainsTelegramContact(MessageFilter):
 
 
 class ContainsLink(MessageFilter):
-    def __init__(self) -> None:
-        self.extractor = URLExtract()
 
     def filter(self, message: Message) -> bool:
         if message.text is None:
             return False  # type: ignore
 
-        return len(self.extractor.find_urls(message.text)) >= 1
+        entities_types = set([entity.type for entity in message.entities])
+        has_links = len(entities_types.intersection({'url', 'text_link'})) != 0
+
+        if DB_ENABLED() and has_links:
+            return is_fake_user(message.from_user.id)
+
+        return has_links
 
 
 class ContainsThreeOrMoreEmojies(MessageFilter):

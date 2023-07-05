@@ -14,5 +14,8 @@ lint:
 	flake8 *.py
 	mypy
 
+fmt:
+	isort .
+
 dev:
 	watchmedo auto-restart --patterns '*.py' python bot.py

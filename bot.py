@@ -1,28 +1,17 @@
-from typing import Optional
-
 import os
 from telegram import Message, Update
-from telegram.ext import CallbackContext, Dispatcher, MessageHandler, Updater
-from telegram.ext.filters import BaseFilter, Filters
+from telegram.ext import Application, ContextTypes, MessageHandler
+from telegram.ext.filters import TEXT, BaseFilter
 
-import rekognition
 import text
 from filters import ContainsLink, ContainsTelegramContact, ContainsThreeOrMoreEmojies, IsMedia, IsMessageOnBehalfOfChat, with_default_filters
 from helpers import DB_ENABLED, enable_logging, in_production, init_sentry
 
 
-def get_profile_picture(message: Message) -> Optional[str]:
-    photos = message.from_user.get_profile_photos()
-
-    if photos is not None and photos.total_count > 0:
-        profile_picture = photos.photos[0][0].get_file()
-        return profile_picture.file_path
-
-
-def log_message(message: Message, action: Optional[str] = ''):
+async def log_message(message: Message | None, action: str | None = ''):
     """Create a log entry for telegram message"""
 
-    if message is None or not DB_ENABLED():
+    if message is None or not DB_ENABLED() or message.from_user is None:
         return
     from models import LogEntry
 
@@ -32,24 +21,19 @@ def log_message(message: Message, action: Optional[str] = ''):
         message_id=message.message_id,
         text=message.text or '',
         meta={
-            'tags': [
-                *rekognition.get_labels(image_url=get_profile_picture(message)),
-                *text.Labels(message.text)(),
-            ],
+            'tags': text.Labels(message.text)(),
         },
         raw=message.to_dict(),
         action=action,
     )
 
 
-def delete(update: Update, context: CallbackContext):
+async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.message or update.edited_message
 
-    log_message(message, action='delete')
-    message.bot.delete_message(
-        message_id=message.message_id,
-        chat_id=message.chat_id,
-    )
+    if message is not None:
+        await log_message(message, action='delete')
+        await message.delete()
 
 
 def delete_messages_that_match(*filters: BaseFilter) -> MessageHandler:
@@ -59,6 +43,7 @@ def delete_messages_that_match(*filters: BaseFilter) -> MessageHandler:
 
 if __name__ == '__main__':
     from dotenv import load_dotenv
+
     load_dotenv()
 
     bot_token = os.getenv('BOT_TOKEN')
@@ -66,31 +51,31 @@ if __name__ == '__main__':
         raise RuntimeError('Please set BOT_TOKEN environment variable')
     app_name = os.getenv('BOT_NAME')
 
-    bot = Updater(token=bot_token)
-    dispatcher: Dispatcher = bot.dispatcher  # type: ignore
+    bot = Application.builder().token(bot_token).build()
 
-    dispatcher.add_handler(delete_messages_that_match(ContainsTelegramContact()))
-    dispatcher.add_handler(delete_messages_that_match(ContainsLink()))
-    dispatcher.add_handler(delete_messages_that_match(IsMessageOnBehalfOfChat()))
-    dispatcher.add_handler(delete_messages_that_match(ContainsThreeOrMoreEmojies()))
-    dispatcher.add_handler(delete_messages_that_match(IsMedia()))
+    bot.add_handler(delete_messages_that_match(ContainsTelegramContact()))
+    bot.add_handler(delete_messages_that_match(ContainsLink()))
+    bot.add_handler(delete_messages_that_match(IsMessageOnBehalfOfChat()))
+    bot.add_handler(delete_messages_that_match(ContainsThreeOrMoreEmojies()))
+    bot.add_handler(delete_messages_that_match(IsMedia()))
 
     if DB_ENABLED():  # log all not handled messages
         from models import create_tables
+
         create_tables()  # type: ignore
-        dispatcher.add_handler(
-            MessageHandler(filters=Filters.text, callback=lambda update, context: log_message(update.message or update.edited_message)),
+        bot.add_handler(
+            MessageHandler(filters=TEXT,
+                           callback=lambda update, context: log_message(update.message or update.edited_message)),
         )
 
     if in_production():
         init_sentry()
-        bot.start_webhook(
+        bot.run_webhook(
             listen='0.0.0.0',
             port=8000,
             url_path=bot_token,
             webhook_url=f'https://{app_name}.tough-dev.school/' + bot_token,
         )
-        bot.idle()
     else:  # bot is running on the dev machine
         enable_logging()
-        bot.start_polling()
+        bot.run_polling()

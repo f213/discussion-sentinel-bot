@@ -1,8 +1,0 @@
-python-telegram-bot<20
-python-dotenv
-sentry-sdk
-peewee
-psycopg2-binary
-boto3
-httpx
-emoji

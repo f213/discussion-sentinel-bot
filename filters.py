@@ -1,7 +1,7 @@
 import operator
 from functools import reduce
 from telegram import Message
-from telegram.ext import BaseFilter, MessageFilter
+from telegram.ext.filters import BaseFilter, MessageFilter
 
 import text
 from helpers import DB_ENABLED
@@ -11,7 +11,7 @@ class HasNoValidPreviousMessages(MessageFilter):
     MIN_PREVIOUS_MESSAGES_COUNT = 3
 
     def filter(self, message: Message) -> bool:
-        if not DB_ENABLED():
+        if not DB_ENABLED() or message.from_user is None:
             return True
 
         return self.has_no_valid_previous_messages(user_id=message.from_user.id, chat_id=message.chat_id)
@@ -50,7 +50,7 @@ class IsMessageOnBehalfOfChat(MessageFilter):
 class ContainsTelegramContact(MessageFilter):
     def filter(self, message: Message) -> bool:
         if message.text is None:
-            return False  # type: ignore
+            return False
 
         return ' @' in message.text or message.text.startswith('@')
 
@@ -59,7 +59,7 @@ class ContainsLink(MessageFilter):
 
     def filter(self, message: Message) -> bool:
         if message.text is None:
-            return False  # type: ignore
+            return False
 
         entities_types = set([entity.type for entity in message.entities])
         return len(entities_types.intersection({'url', 'text_link'})) != 0

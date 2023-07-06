@@ -1,0 +1,77 @@
+[project]
+name = "channel-discussion-antispam-bot"
+version = "0.0.1"
+dependencies = [
+  "python-telegram-bot[webhooks]>20",
+  "python-dotenv",
+  "sentry-sdk",
+  "peewee",
+  "psycopg2-binary",
+  "emoji",
+]
+
+
+[project.optional-dependencies]
+dev = [
+  "ipython",
+  "watchdog[watchmedo]",
+  "mypy",
+  "types-emoji",
+  "types-boto3",
+  "isort",
+  "autopep8<1.6.0",
+  "flake8-bugbear",
+  "flake8-cognitive-complexity",
+  "flake8-commas",
+  "flake8-eradicate",
+  "flake8-isort>=4.0.0",
+  "flake8-fixme",
+  "flake8-multiline-containers",
+  "flake8-mutable",
+  "flake8-pep3101",
+  "flake8-pie",
+  "flake8-print",
+  "flake8-printf-formatting",
+  "flake8-quotes",
+  "flake8-simplify",
+  "flake8-todo",
+  "flake8-use-fstring",
+  "flake8-variables-names",
+  "flake8-walrus",
+  "flake8-pyproject",
+]
+
+
+
+[tool.setuptools]
+packages = []
+
+
+[tool.flake8]
+max-line-length = 160
+ignore = [
+  "E501",
+  "E265",
+  "F811",
+  "B010",
+  "PT001",
+  "VNE003",
+  "PIE783",
+  "PIE785",
+  "SIM113",
+  "SIM102",
+  "FS003",
+  "W504",
+  "PIE801",
+]
+exclude = [
+  "venv",
+  ".git",
+  "__pycache__",
+]
+
+
+[tool.isort]
+line_length = 160
+known_standard_library = ["typing"]
+multi_line_output = 4

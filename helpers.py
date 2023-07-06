@@ -1,6 +1,7 @@
 import logging
 import os
 import sentry_sdk
+from sentry_sdk.integrations.asyncio import AsyncioIntegration
 
 
 def DB_ENABLED() -> bool:
@@ -22,7 +23,12 @@ def init_sentry() -> None:
     sentry_dsn = os.getenv('SENTRY_DSN', None)
 
     if sentry_dsn:
-        sentry_sdk.init(sentry_dsn)
+        sentry_sdk.init(
+            dsn=sentry_dsn,
+            integrations=[
+                AsyncioIntegration(),
+            ],
+        )
 
 
 __all__ = [

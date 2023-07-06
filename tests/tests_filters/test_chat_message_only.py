@@ -4,7 +4,7 @@ from filters import ChatMessageOnly
 
 
 @pytest.fixture(scope="session")
-def filter_obg():
+def filter_obj():
     return ChatMessageOnly()
 
 

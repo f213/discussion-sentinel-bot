@@ -24,7 +24,7 @@ def message(mock_message, mock_message_entity):
 
 
 @pytest.fixture(scope="session")
-def filter_obg():
+def filter_obj():
     return ContainsLink()
 
 

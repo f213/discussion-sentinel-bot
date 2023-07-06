@@ -36,14 +36,14 @@ def message(mock_message, user):
 
 
 @pytest.fixture(scope="session")
-def filter_obg():
+def filter_obj():
     return HasNoValidPreviousMessages()
 
 
 @pytest.fixture
-def valid_messages(user, filter_obg):
+def valid_messages(user, filter_obj):
     message_id = 1
-    for _ in range(filter_obg.MIN_PREVIOUS_MESSAGES_COUNT):
+    for _ in range(filter_obj.MIN_PREVIOUS_MESSAGES_COUNT):
         create_log_message(user_id=user.id, message_id=message_id)
         message_id += 1
 

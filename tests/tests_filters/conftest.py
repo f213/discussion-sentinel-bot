@@ -4,5 +4,5 @@ import pytest
 
 
 @pytest.fixture
-def do_filter(filter_obg) -> Callable[[], bool]:
-    return lambda message: filter_obg.filter(message)
+def do_filter(filter_obj) -> Callable[[], bool]:
+    return lambda message: filter_obj.filter(message)

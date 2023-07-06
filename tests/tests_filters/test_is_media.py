@@ -14,7 +14,7 @@ def message(mock_message):
 
 
 @pytest.fixture(scope="session")
-def filter_obg():
+def filter_obj():
     return IsMedia()
 
 

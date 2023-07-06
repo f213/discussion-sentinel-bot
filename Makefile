@@ -5,10 +5,10 @@ install-deps: deps
 	pip-sync requirements.txt
 
 deps:
-	pip-compile requirements.in
+	pip-compile --resolver=backtracking --output-file=requirements.txt pyproject.toml
 
 dev-deps: deps
-	pip-compile dev-requirements.in
+	pip-compile --resolver=backtracking --extra=dev --output-file=dev-requirements.txt pyproject.toml
 
 lint:
 	flake8 *.py

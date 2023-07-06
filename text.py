@@ -14,7 +14,7 @@ class Labels:
         if self.text is None:
             return []
 
-        emoji_count = len(emoji.emoji_lis(self.text))
+        emoji_count = len(emoji.emoji_list(self.text))
 
         if emoji_count == 0:
             return []

@@ -11,7 +11,7 @@ class HasNoValidPreviousMessages(MessageFilter):
     MIN_PREVIOUS_MESSAGES_COUNT = 3
 
     def filter(self, message: Message) -> bool:
-        if not DB_ENABLED() or not message.from_user:
+        if not DB_ENABLED() or message.from_user is None:
             return True
 
         return self.has_no_valid_previous_messages(user_id=message.from_user.id, chat_id=message.chat_id)

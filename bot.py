@@ -12,7 +12,7 @@ from helpers import DB_ENABLED, enable_logging, in_production, init_sentry
 async def log_message(message: Message | None, action: str | None = ''):
     """Create a log entry for telegram message"""
 
-    if message is None or not DB_ENABLED() or not message.from_user:
+    if message is None or not DB_ENABLED() or message.from_user is None:
         return
     from models import LogEntry
 
@@ -34,7 +34,7 @@ async def log_message(message: Message | None, action: str | None = ''):
 async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.message or update.edited_message
 
-    if message:
+    if message is not None:
         await log_message(message, action='delete')
         await message.delete()
 

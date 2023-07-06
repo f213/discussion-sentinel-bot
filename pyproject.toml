@@ -83,10 +83,6 @@ multi_line_output = 4
 
 [tool.pytest.ini_options]
 python_files = ["test*.py"]
-filterwarnings = [# Pattern: `action:message:category:module:line` (https://docs.python.org/3/library/warnings.html#describing-warning-filters)
-  "ignore:SelectableGroups dict interface is deprecated. Use select",
-  "ignore:.*'cgi' is deprecated and slated for removal in Python 3.13.*",
-]
 env = [
   "DATABASE_URL=postgres://postgres@localhost:5432/postgres"
 ]

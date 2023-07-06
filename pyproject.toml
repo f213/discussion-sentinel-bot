@@ -39,6 +39,11 @@ dev = [
   "flake8-variables-names",
   "flake8-walrus",
   "flake8-pyproject",
+
+  "pytest-deadfixtures",
+  "pytest-mock",
+  "pytest-randomly",
+  "pytest-env",
 ]
 
 
@@ -75,3 +80,9 @@ exclude = [
 line_length = 160
 known_standard_library = ["typing"]
 multi_line_output = 4
+
+[tool.pytest.ini_options]
+python_files = ["test*.py"]
+env = [
+  "DATABASE_URL=postgres://postgres@localhost:5432/postgres"
+]

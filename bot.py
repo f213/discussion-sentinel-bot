@@ -4,7 +4,6 @@ from telegram import Message, Update
 from telegram.ext import Application, ContextTypes, MessageHandler
 from telegram.ext.filters import TEXT, BaseFilter
 
-import rekognition
 import text
 from filters import ContainsLink, ContainsTelegramContact, ContainsThreeOrMoreEmojies, IsMedia, IsMessageOnBehalfOfChat, with_default_filters
 from helpers import DB_ENABLED, enable_logging, in_production, init_sentry
@@ -26,8 +25,6 @@ async def log_message(message: Message | None, action: str | None = ''):
         return
     from models import LogEntry
 
-    picture_url = await get_profile_picture(message)
-
     LogEntry.create(
         user_id=message.from_user.id,
         chat_id=message.chat_id,
@@ -35,7 +32,6 @@ async def log_message(message: Message | None, action: str | None = ''):
         text=message.text or '',
         meta={
             'tags': [
-                *rekognition.get_labels(image_url=picture_url),
                 *text.Labels(message.text)(),
             ],
         },

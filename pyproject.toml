@@ -2,14 +2,11 @@
 name = "channel-discussion-antispam-bot"
 version = "0.0.1"
 dependencies = [
-  "python-telegram-bot>20",
-  "python-telegram-bot[webhooks]",
+  "python-telegram-bot[webhooks]>20",
   "python-dotenv",
   "sentry-sdk",
   "peewee",
   "psycopg2-binary",
-  "boto3",
-  "httpx",
   "emoji",
 ]
 

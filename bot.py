@@ -9,15 +9,6 @@ from filters import ContainsLink, ContainsTelegramContact, ContainsThreeOrMoreEm
 from helpers import DB_ENABLED, enable_logging, in_production, init_sentry
 
 
-async def get_profile_picture(message: Message) -> str | None:
-    if message.from_user:
-        photos = await message.from_user.get_profile_photos()
-
-        if photos is not None and photos.total_count > 0:
-            profile_picture = await photos.photos[0][0].get_file()
-            return profile_picture.file_path
-
-
 async def log_message(message: Message | None, action: str | None = ''):
     """Create a log entry for telegram message"""
 

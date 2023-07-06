@@ -17,5 +17,10 @@ lint:
 fmt:
 	isort .
 
+test:
+	pytest --dead-fixtures
+	pytest -x
+
 dev:
 	watchmedo auto-restart --patterns '*.py' python bot.py
+

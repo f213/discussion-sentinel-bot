@@ -18,10 +18,16 @@ class LogEntry(pw.Model):
     class Meta:
         database = db
         indexes = (
-            ('chat_id', 'message_id'),
-            True,
+            (
+                ('chat_id', 'message_id'),
+                True,
+            ),
         )
 
 
 def create_tables():
     db.create_tables([LogEntry])
+
+
+def drop_tables():
+    db.drop_tables([LogEntry])

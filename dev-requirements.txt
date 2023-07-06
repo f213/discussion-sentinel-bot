@@ -39,7 +39,9 @@ emoji==1.7.0
 eradicate==2.3.0
     # via flake8-eradicate
 exceptiongroup==1.1.2
-    # via anyio
+    # via
+    #   anyio
+    #   pytest
 executing==1.2.0
     # via stack-data
 flake8==6.0.0
@@ -106,6 +108,8 @@ idna==3.4
     # via
     #   anyio
     #   httpx
+iniconfig==2.0.0
+    # via pytest
 ipython==8.14.0
     # via channel-discussion-antispam-bot (pyproject.toml)
 isort==5.12.0
@@ -122,6 +126,8 @@ mypy==1.4.1
     # via channel-discussion-antispam-bot (pyproject.toml)
 mypy-extensions==1.0.0
     # via mypy
+packaging==23.1
+    # via pytest
 parso==0.8.3
     # via jedi
 peewee==3.16.2
@@ -130,6 +136,8 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
+pluggy==1.2.0
+    # via pytest
 prompt-toolkit==3.0.39
     # via ipython
 psycopg2-binary==2.9.6
@@ -148,6 +156,20 @@ pyflakes==3.0.1
     # via flake8
 pygments==2.15.1
     # via ipython
+pytest==7.4.0
+    # via
+    #   pytest-deadfixtures
+    #   pytest-env
+    #   pytest-mock
+    #   pytest-randomly
+pytest-deadfixtures==2.2.1
+    # via channel-discussion-antispam-bot (pyproject.toml)
+pytest-env==0.8.2
+    # via channel-discussion-antispam-bot (pyproject.toml)
+pytest-mock==3.11.1
+    # via channel-discussion-antispam-bot (pyproject.toml)
+pytest-randomly==3.12.0
+    # via channel-discussion-antispam-bot (pyproject.toml)
 python-dotenv==1.0.0
     # via channel-discussion-antispam-bot (pyproject.toml)
 python-telegram-bot[webhooks]==20.3
@@ -171,6 +193,7 @@ tomli==2.0.1
     # via
     #   flake8-pyproject
     #   mypy
+    #   pytest
 tornado==6.3.2
     # via python-telegram-bot
 traitlets==5.9.0

@@ -13,7 +13,6 @@ class HasNoValidPreviousMessages(MessageFilter):
     def filter(self, message: Message) -> bool:
         if not DB_ENABLED() or message.from_user is None:
             return True
-
         return self.has_no_valid_previous_messages(user_id=message.from_user.id, chat_id=message.chat_id)
 
     @classmethod
@@ -61,8 +60,7 @@ class ContainsLink(MessageFilter):
         if message.text is None:
             return False
 
-        entities_types = set([entity.type for entity in message.entities])
-        return len(entities_types.intersection({'url', 'text_link'})) != 0
+        return any(entity.type in ('url', 'text_link') for entity in message.entities)
 
 
 class ContainsThreeOrMoreEmojies(MessageFilter):

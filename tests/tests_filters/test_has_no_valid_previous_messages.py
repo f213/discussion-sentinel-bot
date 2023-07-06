@@ -7,6 +7,18 @@ from models import LogEntry
 CHAT_ID = 1
 
 
+def create_log_message(user_id: int, chat_id: int = CHAT_ID, action: str = '', message_id: int = random.randint(1, 9999)):
+    return LogEntry.create(
+        user_id=user_id,
+        chat_id=chat_id,
+        message_id=message_id,
+        text='meh',
+        meta={'tags': ["ou"]},
+        raw={'text': 'meh'},
+        action=action,
+    )
+
+
 @pytest.fixture
 def user():
     class FakeUser:
@@ -14,21 +26,6 @@ def user():
             self.id = id
 
     return FakeUser(4815162342)
-
-
-@pytest.fixture
-def create_log_message():
-    return lambda user_id, chat_id=CHAT_ID, action='', message_id=random.randint(1, 9999): LogEntry.create(
-        user_id=user_id,
-        chat_id=chat_id,
-        message_id=message_id,
-        text='meh',
-        meta={
-            'tags': ["ou"],
-        },
-        raw={'text': 'meh'},
-        action=action,
-    )
 
 
 @pytest.fixture
@@ -44,7 +41,7 @@ def filter_obg():
 
 
 @pytest.fixture
-def valid_messages(user, create_log_message, filter_obg):
+def valid_messages(user, filter_obg):
     message_id = 1
     for _ in range(filter_obg.MIN_PREVIOUS_MESSAGES_COUNT):
         create_log_message(user_id=user.id, message_id=message_id)

@@ -32,8 +32,45 @@ jobs:
           . venv/bin/activate
           make lint
 
-  build-docker-image:
+  test:
     needs: build
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13.9-alpine
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        id: setup-python
+        with:
+          python-version-file: '.python-version'
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            venv
+          key: ${{ runner.os }}-venv-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/*requirements.txt') }}
+
+      - name: Run the tests
+        env:
+          DATABASE_URL: postgres://postgres@localhost:5432/postgres
+        run: |
+          . venv/bin/activate
+          make test
+
+  build-docker-image:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

@@ -1,4 +1,3 @@
-
 import os
 from telegram import Message, Update
 from telegram.ext import Application, ContextTypes, MessageHandler
@@ -22,9 +21,7 @@ async def log_message(message: Message | None, action: str | None = ''):
         message_id=message.message_id,
         text=message.text or '',
         meta={
-            'tags': [
-                *text.Labels(message.text)(),
-            ],
+            'tags': text.Labels(message.text)(),
         },
         raw=message.to_dict(),
         action=action,
@@ -46,6 +43,7 @@ def delete_messages_that_match(*filters: BaseFilter) -> MessageHandler:
 
 if __name__ == '__main__':
     from dotenv import load_dotenv
+
     load_dotenv()
 
     bot_token = os.getenv('BOT_TOKEN')
@@ -63,9 +61,11 @@ if __name__ == '__main__':
 
     if DB_ENABLED():  # log all not handled messages
         from models import create_tables
+
         create_tables()  # type: ignore
         bot.add_handler(
-            MessageHandler(filters=TEXT, callback=lambda update, context: log_message(update.message or update.edited_message)),
+            MessageHandler(filters=TEXT,
+                           callback=lambda update, context: log_message(update.message or update.edited_message)),
         )
 
     if in_production():

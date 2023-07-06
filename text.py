@@ -1,16 +1,15 @@
-from typing import List, Optional
 
 import emoji
 
 
 class Labels:
-    def __init__(self, text: Optional[str]) -> None:
+    def __init__(self, text: str | None) -> None:
         self.text = text
 
-    def __call__(self) -> List[str]:
+    def __call__(self) -> list[str]:
         return self.get_emoji_label()
 
-    def get_emoji_label(self) -> List[str]:
+    def get_emoji_label(self) -> list[str]:
         if self.text is None:
             return []
 

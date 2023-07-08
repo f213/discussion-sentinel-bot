@@ -17,7 +17,7 @@ jobs:
         with:
           path: |
             venv
-          key: ${{ runner.os }}-venv-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/*requirements.txt') }}
+          key: ${{ runner.os }}-venv-v1-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/*requirements.txt') }}
 
       - name: Install dependencies
         if: steps.cache-primes.outputs.cache-hit != 'true'
@@ -60,7 +60,7 @@ jobs:
         with:
           path: |
             venv
-          key: ${{ runner.os }}-venv-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/*requirements.txt') }}
+          key: ${{ runner.os }}-venv-v1-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/*requirements.txt') }}
 
       - name: Run the tests
         env:

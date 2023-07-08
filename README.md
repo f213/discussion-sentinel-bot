@@ -7,4 +7,4 @@ Removes spam messasges from the telegram channel discussion. Ignores old-time me
 
 ## Usage
 
-Add our [hosted version](t.me/discussion_sentinel_bot) as an admin to your channel discussion group. That is it!
+Add our [hosted version](https://t.me/discussion_sentinel_bot) as an admin to your channel discussion group. That is it!

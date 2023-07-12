@@ -1,6 +1,6 @@
 import os
 from telegram import Message, Update
-from telegram.ext import Application, ContextTypes, MessageHandler
+from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler
 from telegram.ext.filters import TEXT, BaseFilter
 
 import text
@@ -28,12 +28,25 @@ async def log_message(message: Message | None, action: str | None = ''):
     )
 
 
-async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Delete a message"""
     message = update.message or update.edited_message
 
     if message is not None:
         await log_message(message, action='delete')
         await message.delete()
+
+
+async def introduce_myself(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if update.effective_chat is not None:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="""
+Это бот, который чистит спам из телеграм-комментов. Чтобы он заработал — добавьте его как админа в дискуссионную группу канала. Не забудьте разрешить удалять сообщения.
+
+По всем вопросам пишите fborshev@pm.me
+    """,
+        )
 
 
 def delete_messages_that_match(*filters: BaseFilter) -> MessageHandler:
@@ -53,6 +66,8 @@ if __name__ == '__main__':
 
     bot = Application.builder().token(bot_token).build()
 
+    bot.add_handler(CommandHandler('start', introduce_myself))
+
     bot.add_handler(delete_messages_that_match(ContainsTelegramContact()))
     bot.add_handler(delete_messages_that_match(ContainsLink()))
     bot.add_handler(delete_messages_that_match(IsMessageOnBehalfOfChat()))
@@ -64,8 +79,10 @@ if __name__ == '__main__':
 
         create_tables()  # type: ignore
         bot.add_handler(
-            MessageHandler(filters=TEXT,
-                           callback=lambda update, context: log_message(update.message or update.edited_message)),
+            MessageHandler(
+                filters=TEXT,
+                callback=lambda update, context: log_message(update.message or update.edited_message),
+            ),
         )
 
     if in_production():

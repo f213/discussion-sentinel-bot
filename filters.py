@@ -41,7 +41,7 @@ def with_default_filters(*filters: BaseFilter) -> BaseFilter:
     very_strict_filter = [
         IsMessageOnBehalfOfChat(),
     ]
-    return reduce(operator.and_, [*default_filters, *filters]) and not reduce(operator.or_, [*very_strict_filter])
+    return reduce(operator.and_, [*default_filters, *filters]) or reduce(operator.or_, [*very_strict_filter])
 
 
 class IsMessageOnBehalfOfChat(MessageFilter):

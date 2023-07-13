@@ -8,7 +8,7 @@ from filters import ContainsLink, ContainsTelegramContact, ContainsThreeOrMoreEm
 from helpers import DB_ENABLED, enable_logging, in_production, init_sentry
 
 
-async def log_message(message: Message | None, action: str | None = ''):
+async def log_message(message: Message | None, action: str | None = '') -> None:
     """Create a log entry for telegram message"""
 
     if message is None or not DB_ENABLED() or message.from_user is None:
@@ -70,7 +70,6 @@ if __name__ == '__main__':
 
     bot.add_handler(delete_messages_that_match(ContainsTelegramContact()))
     bot.add_handler(delete_messages_that_match(ContainsLink()))
-    bot.add_handler(delete_messages_that_match(IsMessageOnBehalfOfChat()))
     bot.add_handler(delete_messages_that_match(ContainsThreeOrMoreEmojies()))
     bot.add_handler(delete_messages_that_match(IsMedia()))
 

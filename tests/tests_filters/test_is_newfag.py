@@ -24,8 +24,7 @@ def user():
     class FakeUser:
         def __init__(self, id: int):
             self.id = id
-    newfag_id = IsNewfag.OLDFAG_ID_BORDER
-    return FakeUser(newfag_id)
+    return FakeUser(10**9 + 1)
 
 
 @pytest.fixture
@@ -43,7 +42,7 @@ def filter_obj():
 @pytest.fixture
 def valid_messages(user, filter_obj):
     message_id = 1
-    for _ in range(filter_obj.MIN_PREVIOUS_MESSAGES_COUNT):
+    for _ in range(3):
         create_log_message(user_id=user.id, message_id=message_id)
         message_id += 1
 

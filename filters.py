@@ -7,13 +7,18 @@ import text
 from helpers import DB_ENABLED
 
 
-class HasNoValidPreviousMessages(MessageFilter):
+class IsNewfag(MessageFilter):
     MIN_PREVIOUS_MESSAGES_COUNT = 3
+    OLDFAG_ID_BORDER = 10**9
 
     def filter(self, message: Message) -> bool:
         if not DB_ENABLED() or message.from_user is None:
             return True
-        return self.has_no_valid_previous_messages(user_id=message.from_user.id, chat_id=message.chat_id)
+        return self.is_not_true_oldfag(message.from_user.id) and self.has_no_valid_previous_messages(user_id=message.from_user.id, chat_id=message.chat_id)
+
+    @classmethod
+    def is_not_true_oldfag(cls, user_id: int) -> bool:
+        return int(user_id) >= cls.OLDFAG_ID_BORDER
 
     @classmethod
     def has_no_valid_previous_messages(cls, user_id: int, chat_id: int) -> bool:
@@ -36,7 +41,7 @@ def with_default_filters(*filters: BaseFilter) -> BaseFilter:
     """Apply default filters to the given filter classes"""
     default_filters = [
         ChatMessageOnly(),
-        HasNoValidPreviousMessages(),
+        IsNewfag(),
     ]
     return reduce(operator.and_, [*default_filters, *filters])  # МАМА Я УМЕЮ ФУНКЦИОНАЛЬНО ПРОГРАММИРОВАТЬ
 

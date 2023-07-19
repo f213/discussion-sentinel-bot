@@ -5,13 +5,13 @@ from telegram.ext.filters import TEXT, BaseFilter
 
 import text
 from filters import ContainsLink, ContainsTelegramContact, ContainsThreeOrMoreEmojies, IsMedia, IsMessageOnBehalfOfChat, with_default_filters
-from helpers import DB_ENABLED, enable_logging, in_production, init_sentry
+from helpers import enable_logging, in_production, init_sentry
 
 
 async def log_message(message: Message | None, action: str | None = ''):
     """Create a log entry for telegram message"""
 
-    if message is None or not DB_ENABLED() or message.from_user is None:
+    if message is None or message.from_user is None:
         return
     from models import LogEntry
 
@@ -74,16 +74,15 @@ if __name__ == '__main__':
     bot.add_handler(delete_messages_that_match(ContainsThreeOrMoreEmojies()))
     bot.add_handler(delete_messages_that_match(IsMedia()))
 
-    if DB_ENABLED():  # log all not handled messages
-        from models import create_tables
+    from models import create_tables
 
-        create_tables()  # type: ignore
-        bot.add_handler(
-            MessageHandler(
-                filters=TEXT,
-                callback=lambda update, context: log_message(update.message or update.edited_message),
-            ),
-        )
+    create_tables()  # type: ignore
+    bot.add_handler(
+        MessageHandler(
+            filters=TEXT,
+            callback=lambda update, context: log_message(update.message or update.edited_message),
+        ),
+    )
 
     if in_production():
         init_sentry()

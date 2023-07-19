@@ -4,10 +4,6 @@ import sentry_sdk
 from sentry_sdk.integrations.asyncio import AsyncioIntegration
 
 
-def DB_ENABLED() -> bool:
-    return os.getenv('DATABASE_URL') is not None
-
-
 def in_production() -> bool:
     return os.getenv('BOT_NAME', None) is not None
 
@@ -32,7 +28,6 @@ def init_sentry() -> None:
 
 
 __all__ = [
-    'DB_ENABLED',
     'enable_logging',
     'in_production',
     'init_sentry',

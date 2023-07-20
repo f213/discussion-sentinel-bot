@@ -5,7 +5,7 @@ from playhouse.postgres_ext import JSONField
 
 database_url = os.getenv('DATABASE_URL')
 if not database_url:
-    raise RuntimeError('Please set BOT_TOKEN environment variable')
+    raise RuntimeError('Please set DATABASE_URL environment variable')
 db = connect(database_url)
 
 

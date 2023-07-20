@@ -58,12 +58,6 @@ def test_true_if_not_from_user(do_filter, message):
     assert do_filter(message) is True
 
 
-def test_true_if_db_disabled(do_filter, message, mocker):
-    mocker.patch("helpers.DB_ENABLED", return_value=False)
-
-    assert do_filter(message) is True
-
-
 def test_true_if_has_not_enough_valid_messages(do_filter, message, valid_messages):
     LogEntry.get(LogEntry.message_id == 1).delete_instance()
 

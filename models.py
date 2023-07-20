@@ -3,7 +3,10 @@ import peewee as pw
 from playhouse.db_url import connect
 from playhouse.postgres_ext import JSONField
 
-db = connect(os.getenv('DATABASE_URL'))
+database_url = os.getenv('DATABASE_URL')
+if not database_url:
+    raise RuntimeError('Please set DATABASE_URL environment variable')
+db = connect(database_url)
 
 
 class LogEntry(pw.Model):

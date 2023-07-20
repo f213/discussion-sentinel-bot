@@ -7,33 +7,24 @@ import text
 from helpers import DB_ENABLED
 
 
-class IsNewfag(MessageFilter):
+class HasNoValidPreviousMessages(MessageFilter):
+    MIN_PREVIOUS_MESSAGES_COUNT = 3
 
     def filter(self, message: Message) -> bool:
         if not DB_ENABLED() or message.from_user is None:
             return True
+        return self.has_no_valid_previous_messages(user_id=message.from_user.id, chat_id=message.chat_id)
 
-        return not self.message_is_from_oldfag(message)
-
-    def message_is_from_oldfag(self, message: Message) -> bool:
-        if int(message.from_user.id) < 10**9:  # type: ignore
-            return True
-
-        messages_count = self.messages_count(user_id=message.from_user.id, chat_id=message.chat_id)  # type: ignore
-        if messages_count >= 3:
-            return True
-
-        return False
-
-    @staticmethod
-    def messages_count(user_id: int, chat_id: int) -> int:
+    @classmethod
+    def has_no_valid_previous_messages(cls, user_id: int, chat_id: int) -> bool:
         from models import LogEntry
 
-        return LogEntry.select().where(
+        messages_count = LogEntry.select().where(
             (LogEntry.user_id == user_id),
             (LogEntry.chat_id == chat_id),
             (LogEntry.action != 'delete'),
         ).count()
+        return messages_count < cls.MIN_PREVIOUS_MESSAGES_COUNT
 
 
 class ChatMessageOnly(MessageFilter):
@@ -45,7 +36,7 @@ def with_default_filters(*filters: BaseFilter) -> BaseFilter:
     """Apply default filters to the given filter classes"""
     default_filters = [
         ChatMessageOnly(),
-        IsNewfag(),
+        HasNoValidPreviousMessages(),
     ]
     return reduce(operator.and_, [*default_filters, *filters])  # МАМА Я УМЕЮ ФУНКЦИОНАЛЬНО ПРОГРАММИРОВАТЬ
 

@@ -1,7 +1,7 @@
 import pytest
 import random
 
-from filters import IsNewfag
+from filters import HasNoValidPreviousMessages
 from models import LogEntry
 
 CHAT_ID = 1
@@ -24,7 +24,8 @@ def user():
     class FakeUser:
         def __init__(self, id: int):
             self.id = id
-    return FakeUser(10**9 + 1)
+
+    return FakeUser(4815162342)
 
 
 @pytest.fixture
@@ -36,13 +37,13 @@ def message(mock_message, user):
 
 @pytest.fixture(scope="session")
 def filter_obj():
-    return IsNewfag()
+    return HasNoValidPreviousMessages()
 
 
 @pytest.fixture
 def valid_messages(user, filter_obj):
     message_id = 1
-    for _ in range(3):
+    for _ in range(filter_obj.MIN_PREVIOUS_MESSAGES_COUNT):
         create_log_message(user_id=user.id, message_id=message_id)
         message_id += 1
 
@@ -86,10 +87,4 @@ def test_true_if_user_has_not_enough_valid_messages(do_filter, message, valid_me
 
 
 def test_false_if_has_valid_messages(do_filter, message, valid_messages):
-    assert do_filter(message) is False
-
-
-def test_false_if_true_oldfag(do_filter, message):
-    message.from_user.id = 987654321  # still less than 10^9
-
     assert do_filter(message) is False

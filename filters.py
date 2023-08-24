@@ -42,7 +42,7 @@ def with_default_filters(*filters: BaseFilter) -> BaseFilter:
 
 class IsMessageOnBehalfOfChat(MessageFilter):
     def filter(self, message: Message) -> bool:
-        return message.sender_chat is not None
+        return message.sender_chat is not None and message.sender_chat.id != message.chat.id
 
 
 class ContainsTelegramContact(MessageFilter):

@@ -54,6 +54,14 @@ async def introduce_myself(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         )
 
 
+async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if update.effective_chat is not None:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text='pong!',
+        )
+
+
 def delete_messages_that_match(*filters: BaseFilter) -> MessageHandler:
     """Sugar for quick adding delete message callbacks"""
     return MessageHandler(callback=delete, filters=with_default_filters(*filters))
@@ -72,6 +80,7 @@ if __name__ == '__main__':
     bot = Application.builder().token(bot_token).build()
 
     bot.add_handler(CommandHandler('start', introduce_myself))
+    bot.add_handler(CommandHandler('ping', ping))
 
     bot.add_handler(delete_messages_that_match(ContainsTelegramContact()))
     bot.add_handler(delete_messages_that_match(ContainsLink()))

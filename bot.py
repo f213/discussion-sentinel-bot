@@ -1,5 +1,6 @@
 import os
 from telegram import Message, Update
+from telegram.error import TelegramError
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler
 from telegram.ext.filters import TEXT, BaseFilter
 
@@ -33,8 +34,12 @@ async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     message = update.message or update.edited_message
 
     if message is not None:
-        await log_message(message, action='delete')
-        await message.delete()
+        try:
+            await message.delete()
+        except TelegramError:
+            await log_message(message, action='deletion_error')
+        else:
+            await log_message(message, action='delete')
 
 
 async def introduce_myself(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

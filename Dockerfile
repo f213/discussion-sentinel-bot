@@ -13,4 +13,5 @@ COPY . /srv/
 
 HEALTHCHECK CMD wget -q -O - --content-on-error http://localhost:8000|grep -qi "not found"
 
+USER nobody
 CMD python bot.py

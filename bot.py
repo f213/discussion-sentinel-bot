@@ -9,11 +9,24 @@ from filters import ContainsLink, ContainsTelegramContact, ContainsThreeOrMoreEm
 from helpers import enable_logging, in_production, init_sentry
 
 
+def get_previous_non_deleted_message_count(chat_id: int) -> int:
+    from models import LogEntry
+
+    return LogEntry.select().where(
+        (LogEntry.chat_id == chat_id),
+        (LogEntry.action == 'deletion_error'),
+    ).count()
+
+
 async def log_message(message: Message | None, action: str | None = ''):
     """Create a log entry for telegram message"""
 
     if message is None or message.from_user is None:
         return
+
+    if get_previous_non_deleted_message_count(message.chat_id) > 10:
+        return
+
     from models import LogEntry
 
     LogEntry.create(

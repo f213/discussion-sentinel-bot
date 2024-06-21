@@ -61,8 +61,6 @@ async def introduce_myself(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             chat_id=update.effective_chat.id,
             text="""
 Это бот, который чистит спам из телеграм-комментов. Чтобы он заработал — добавьте его как админа в дискуссионную группу канала. Не забудьте разрешить удалять сообщения, без этого бот не будет работать.
-
-Если что-то сломалось, пишите в https://github.com/f213/discussion-sentinel-bot
     """,
         )
 

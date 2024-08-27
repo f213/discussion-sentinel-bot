@@ -93,9 +93,9 @@ if __name__ == '__main__':
     bot.add_handler(CommandHandler('start', introduce_myself))
     bot.add_handler(CommandHandler('ping', ping))
 
+    bot.add_handler(delete_messages_that_match(IsMessageOnBehalfOfChat()))
     bot.add_handler(delete_messages_that_match(ContainsTelegramContact()))
     bot.add_handler(delete_messages_that_match(ContainsLink()))
-    bot.add_handler(delete_messages_that_match(IsMessageOnBehalfOfChat()))
     bot.add_handler(delete_messages_that_match(ContainsThreeOrMoreEmojies()))
     bot.add_handler(delete_messages_that_match(IsMedia()))
 

@@ -31,10 +31,19 @@ class ChatMessageOnly(MessageFilter):
         return message.forward_from_message_id is None
 
 
+class NotRootChatMessage(MessageFilter):
+    def filter(self, message: Message) -> bool:
+        if message.sender_chat is None:
+            return True
+
+        return message.sender_chat.id != message.chat.id
+
+
 def with_default_filters(*filters: BaseFilter) -> BaseFilter:
     """Apply default filters to the given filter classes"""
     default_filters = [
         ChatMessageOnly(),
+        NotRootChatMessage(),
         HasNoValidPreviousMessages(),
     ]
     return reduce(operator.and_, [*default_filters, *filters])  # МАМА Я УМЕЮ ФУНКЦИОНАЛЬНО ПРОГРАММИРОВАТЬ
@@ -54,7 +63,6 @@ class ContainsTelegramContact(MessageFilter):
 
 
 class ContainsLink(MessageFilter):
-
     def filter(self, message: Message) -> bool:
         if message.text is None:
             return False
